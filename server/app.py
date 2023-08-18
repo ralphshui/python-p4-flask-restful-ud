@@ -80,8 +80,21 @@ class NewsletterByID(Resource):
 
         return response
 
-api.add_resource(NewsletterByID, '/newsletters/<int:id>')
+    def patch(self, id):
+        resp_data = Newsletter.query.filter_by(id=id).first()
 
+        for attr in request.form:
+            setattr(resp_data, attr, request.form[attr])
+        
+        db.session.add(resp_data)
+        db.session.commit()
+
+        resp_data_dict = resp_data.to_dict()
+
+        response = make_response(resp_data_dict, 200)
+        return response
+
+api.add_resource(NewsletterByID, '/newsletters/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
